@@ -6,6 +6,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
+    "once": "node -e \"require('./src/monitor').jobOnce().then(() => process.exit()).catch((err) => { console.error(err); process.exit(1); })\"",
     "lint": "echo \"No lint configured\"",
     "monitor": "node src/index.js"
   },

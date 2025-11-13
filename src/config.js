@@ -1,6 +1,7 @@
 const path = require("path");
 const dotenv = require("dotenv");
 const { logger } = require("./logger");
+const { DEFAULT_CITIES, DEFAULT_CATEGORY_URLS } = require("./defaults");
 
 dotenv.config({ path: process.env.CONFIG_PATH || path.resolve(process.cwd(), ".env") });
 
@@ -52,22 +53,54 @@ function parseCategoryUrls() {
   return result;
 }
 
+function resolveCities() {
+  const parsed = parseCities(process.env.CITIES);
+
+  if (parsed.length === 0) {
+    logger.warn("No cities configured in .env; falling back to default city list", {
+      fallback: DEFAULT_CITIES,
+    });
+    return DEFAULT_CITIES;
+  }
+
+  return parsed;
+}
+
+function resolveCategoryUrls() {
+  const parsed = parseCategoryUrls();
+
+  const merged = {
+    mvideo: { ...DEFAULT_CATEGORY_URLS.mvideo, ...parsed.mvideo },
+    eldorado: { ...DEFAULT_CATEGORY_URLS.eldorado, ...parsed.eldorado },
+  };
+
+  if (Object.keys(parsed.mvideo).length === 0) {
+    logger.warn("No M.Video categories configured; using default category set", {
+      fallbackCount: Object.keys(DEFAULT_CATEGORY_URLS.mvideo).length,
+    });
+  }
+
+  if (Object.keys(parsed.eldorado).length === 0) {
+    logger.warn("No Eldorado categories configured; using default category set", {
+      fallbackCount: Object.keys(DEFAULT_CATEGORY_URLS.eldorado).length,
+    });
+  }
+
+  return merged;
+}
+
 const config = {
   mongodbUri: process.env.MONGODB_URI,
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN,
   telegramChatId: process.env.TELEGRAM_CHAT_ID,
   minDiscount: parseNumber(process.env.MIN_DISCOUNT, 30),
   cronSchedule: process.env.CRON_SCHEDULE || "*/15 * * * *",
-  cities: parseCities(process.env.CITIES),
-  categoryUrls: parseCategoryUrls(),
+  cities: resolveCities(),
+  categoryUrls: resolveCategoryUrls(),
   playwright: {
     headless: process.env.PLAYWRIGHT_HEADLESS !== "false",
     slowMo: parseNumber(process.env.PLAYWRIGHT_SLOWMO, undefined),
   },
 };
-
-if (config.cities.length === 0) {
-  logger.warn("No cities configured. Provide CITIES in .env to enable per-city monitoring.");
-}
 
 module.exports = config;

@@ -53,11 +53,14 @@ async function persistOffer(shop, incoming, notify) {
 
 async function processOffers(shop, offers) {
   const toNotify = [];
+  let considered = 0;
 
   for (const offer of offers) {
     if (offer.discount < config.minDiscount) {
       continue;
     }
+
+    considered += 1;
 
     try {
       const existing = await Offer.findOne({ shop, sku: offer.sku, city: offer.city });
@@ -91,7 +94,8 @@ async function processOffers(shop, offers) {
   }
 
   return {
-    processed: offers.length,
+    scraped: offers.length,
+    considered,
     notified: toNotify.length,
   };
 }
@@ -113,6 +117,12 @@ async function jobOnce() {
         logger.error("Scraper failed", { shop, city, error: error.message });
       }
     }
+  }
+
+  if (summary.length === 0) {
+    logger.warn("Monitor job finished with no data");
+  } else {
+    logger.info("Monitor job finished", { summary });
   }
 
   return summary;

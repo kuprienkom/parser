@@ -18,21 +18,23 @@
 
 ## Подготовка окружения
 1. Установите зависимости: `npm install`.
-2. Создайте файл `.env` на основе примера ниже.
+2. Установите браузеры Playwright (одноразово): `npx playwright install chromium`.
+3. Скопируйте `.env.example` в `.env` и укажите собственные значения переменных.
 
 ### Пример `.env`
 ```
-MONGODB_URI=mongodb+srv://user:pass@host/db
+MONGODB_URI=mongodb://localhost:27017/priceWatcher
 TELEGRAM_BOT_TOKEN=123456:ABC-DEF
 TELEGRAM_CHAT_ID=-1001234567890
 MIN_DISCOUNT=30
 CRON_SCHEDULE=*/15 * * * *
-CITIES=Санкт-Петербург,Москва
-
-# Примеры URL категорий (добавьте свои при необходимости)
-MVIDEO_CATEGORY_URL_SMARTPHONES=https://www.mvideo.ru/smartfony-i-svyaz/smartfony-205
-ELDORADO_CATEGORY_URL_SMARTPHONES=https://www.eldorado.ru/c/tehnika-dlya-doma/smartfony/
+# необязательно: переопределите города или URL категорий
+# CITIES=Санкт-Петербург,Москва
+# MVIDEO_CATEGORY_URL_SMARTPHONES=https://www.mvideo.ru/smartfony-i-svyaz/smartfony-205
+# ELDORADO_CATEGORY_URL_SMARTPHONES=https://www.eldorado.ru/c/smartfony-i-svyaz/smartfony/
 ```
+
+По умолчанию сервис мониторит весь основной каталог M.Video и Эльдорадо по Санкт-Петербургу — список разделов задан в `src/defaults.js`.
 
 ## Структура проекта
 ```
@@ -40,6 +42,7 @@ price-watcher/
 ├── src/
 │   ├── bot.js
 │   ├── config.js
+│   ├── defaults.js
 │   ├── db.js
 │   ├── index.js
 │   ├── logger.js
@@ -55,12 +58,12 @@ price-watcher/
 
 ## Запуск
 1. Запустите MongoDB (локально или в облаке) и убедитесь, что URI указан в `.env`.
-2. Заполните `.env` токеном Telegram-бота и целевым чат-ID.
+2. Заполните `.env` токеном Telegram-бота и целевым чат-ID (если не сделали ранее).
 3. Запустите сервис: `npm start`.
 
-После запуска сервис выполнит первый проход парсинга сразу, а затем будет запускать мониторинг по расписанию из переменной `CRON_SCHEDULE`.
+После запуска сервис выполнит первый проход парсинга сразу, а затем будет запускать мониторинг по расписанию из переменной `CRON_SCHEDULE`. Для единичного запуска без расписания можно выполнить `npm run once`.
 
 ## Примечания по разработке
-- Селекторы и URL категорий для магазинов вынесены в конфигурацию, поэтому при изменении DOM сайтов достаточно обновить значения в `.env`.
+- Селекторы и URL категорий для магазинов вынесены в конфигурацию. При необходимости можно дополнить `.env` собственными категориями, они будут объединены с базовым набором из `src/defaults.js`.
 - Скраперы реализуют общий пайплайн Playwright: установка города, загрузка категории, ожидание карточек и преобразование данных.
 - Логи выводятся в стандартный вывод; при необходимости интегрируйте любой JSON-логгер.
