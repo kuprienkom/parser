@@ -1,0 +1,23 @@
+{
+  "name": "price-watcher",
+  "version": "0.1.0",
+  "description": "Autonomous price monitoring service for M.Video and Eldorado with Telegram notifications.",
+  "type": "commonjs",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "once": "node -e \"require('./src/monitor').jobOnce().then(() => process.exit()).catch((err) => { console.error(err); process.exit(1); })\"",
+    "lint": "echo \"No lint configured\"",
+    "monitor": "node src/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "mongoose": "^8.3.2",
+    "node-cron": "^3.0.3",
+    "playwright": "^1.44.1",
+    "telegraf": "^4.16.3"
+  }
+}

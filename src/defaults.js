@@ -1,0 +1,51 @@
+const DEFAULT_CITIES = ["Санкт-Петербург"];
+
+const DEFAULT_CATEGORY_URLS = {
+  mvideo: {
+    televisions: "https://www.mvideo.ru/televizory-i-cifrovoe-tv/televizory-65",
+    soundbars: "https://www.mvideo.ru/audio-i-dvd/domashnie-kinoteatry-i-saunbary-2301",
+    laptops: "https://www.mvideo.ru/noutbuki-planshety-komputery/noutbuki-118",
+    tablets: "https://www.mvideo.ru/noutbuki-planshety-komputery/planshety-2327",
+    smartphones: "https://www.mvideo.ru/smartfony-i-svyaz/smartfony-205",
+    wearables: "https://www.mvideo.ru/smartfony-i-svyaz/nositelnaya-elektronika-3217",
+    photo: "https://www.mvideo.ru/foto-i-videokamery/zerkalnye-fotoapparaty-70",
+    gaming: "https://www.mvideo.ru/igry-i-pristavki/igrovye-pristavki-4007",
+    refrigerators: "https://www.mvideo.ru/krupnaya-bytovaya-tehnika/holodilniki-21",
+    washers: "https://www.mvideo.ru/krupnaya-bytovaya-tehnika/stiralnye-mashiny-161",
+    dishwashers: "https://www.mvideo.ru/krupnaya-bytovaya-tehnika/posudomoechnye-mashiny-85",
+    cookers: "https://www.mvideo.ru/krupnaya-bytovaya-tehnika/varochnye-paneli-i-plity-80",
+    vacuumCleaners: "https://www.mvideo.ru/klimaticheskaya-tehnika-i-uhod-za-domom/pylesosy-17",
+    coffeeMakers: "https://www.mvideo.ru/bytovaya-tehnika-dlya-doma-i-kukhni/kofevarki-164",
+    multicookers: "https://www.mvideo.ru/bytovaya-tehnika-dlya-doma-i-kukhni/multivarki-1808",
+    beauty: "https://www.mvideo.ru/tovary-dlya-krasoty-i-zdorovya/pribory-dlya-uhoda-za-volosami-1874",
+    health: "https://www.mvideo.ru/tovary-dlya-krasoty-i-zdorovya/zdorove-i-krasota-3210",
+    routers: "https://www.mvideo.ru/smartfony-i-svyaz/routery-i-setevoe-oborudovanie-121",
+    smartHome: "https://www.mvideo.ru/smartfony-i-svyaz/umnyi-dom-3213",
+  },
+  eldorado: {
+    televisions: "https://www.eldorado.ru/c/televizory-i-cifrovaya-tehnika/televizory/",
+    soundbars: "https://www.eldorado.ru/c/televizory-i-cifrovaya-tehnika/domashnie-kinoteatry/",
+    laptops: "https://www.eldorado.ru/c/noutbuki-i-kompyutery/noutbuki/",
+    tablets: "https://www.eldorado.ru/c/planshety-i-aksessuary/planshety/",
+    smartphones: "https://www.eldorado.ru/c/smartfony-i-svyaz/smartfony/",
+    wearables: "https://www.eldorado.ru/c/smartfony-i-svyaz/nositelnaya-elektronika/",
+    photo: "https://www.eldorado.ru/c/foto-i-videotehnika/fotoapparaty/",
+    gaming: "https://www.eldorado.ru/c/igry-i-pristavki/igrovye-pristavki/",
+    refrigerators: "https://www.eldorado.ru/c/bytovaya-tehnika-dlya-kuhni/holodilniki/",
+    washers: "https://www.eldorado.ru/c/bytovaya-tehnika-dlya-doma/stiralnye-mashiny/",
+    dishwashers: "https://www.eldorado.ru/c/bytovaya-tehnika-dlya-kuhni/posudomoechnye-mashiny/",
+    cookers: "https://www.eldorado.ru/c/bytovaya-tehnika-dlya-kuhni/varochnye-paneli/",
+    vacuumCleaners: "https://www.eldorado.ru/c/bytovaya-tehnika-dlya-doma/pylesosy/",
+    coffeeMakers: "https://www.eldorado.ru/c/bytovaya-tehnika-dlya-kuhni/kofevarki/",
+    multicookers: "https://www.eldorado.ru/c/bytovaya-tehnika-dlya-kuhni/multivarki/",
+    beauty: "https://www.eldorado.ru/c/krasa-i-zdorove/pribory-dlya-uhoda/",
+    health: "https://www.eldorado.ru/c/krasa-i-zdorove/zdorovye/",
+    routers: "https://www.eldorado.ru/c/smartfony-i-svyaz/routery-i-setevoe-oborudovanie/",
+    smartHome: "https://www.eldorado.ru/c/smartfony-i-svyaz/umnyi-dom/",
+  },
+};
+
+module.exports = {
+  DEFAULT_CITIES,
+  DEFAULT_CATEGORY_URLS,
+};
