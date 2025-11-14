@@ -89,6 +89,83 @@ function resolveCategoryUrls() {
   return merged;
 }
 
+function parseJson(value, fallback, context) {
+  if (!value) {
+    return fallback;
+  }
+
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === "object" ? parsed : fallback;
+  } catch (error) {
+    logger.warn("Failed to parse JSON configuration", {
+      context,
+      error: error.message,
+    });
+    return fallback;
+  }
+}
+
+function resolveMvideoCategories() {
+  const apiListUrl = process.env.MVIDEO_API_LIST_URL;
+  const apiDetailsUrl = process.env.MVIDEO_API_DETAILS_URL;
+  const apiPricesUrl = process.env.MVIDEO_API_PRICES_URL;
+
+  const missingApi = [
+    ["MVIDEO_API_LIST_URL", apiListUrl],
+    ["MVIDEO_API_DETAILS_URL", apiDetailsUrl],
+    ["MVIDEO_API_PRICES_URL", apiPricesUrl],
+  ]
+    .filter(([, value]) => !value)
+    .map(([key]) => key);
+
+  if (missingApi.length > 0) {
+    logger.warn("M.Video API endpoints are not fully configured; skipping categories", {
+      missing: missingApi,
+    });
+    return [];
+  }
+
+  const pageSize = parseNumber(process.env.MVIDEO_PAGE_SIZE, 24);
+  const extraParams = parseJson(process.env.MVIDEO_EXTRA_PARAMS, {}, "MVIDEO_EXTRA_PARAMS");
+
+  const definitions = [
+    {
+      key: "SMARTPHONES",
+      id: process.env.MVIDEO_CAT_SMARTPHONES_ID,
+      city: process.env.MVIDEO_CAT_SMARTPHONES_CITY || "Санкт-Петербург",
+    },
+  ];
+
+  const categories = [];
+
+  for (const definition of definitions) {
+    if (!definition.id) {
+      logger.warn("M.Video category ID is not configured; skipping", {
+        key: definition.key,
+      });
+      continue;
+    }
+
+    categories.push({
+      key: definition.key,
+      id: definition.id,
+      apiListUrl,
+      apiDetailsUrl,
+      apiPricesUrl,
+      pageSize,
+      extraParams,
+      city: definition.city,
+    });
+  }
+
+  if (categories.length === 0) {
+    logger.warn("No M.Video API categories configured; check environment variables");
+  }
+
+  return categories;
+}
+
 const config = {
   mongodbUri: process.env.MONGODB_URI,
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN,
@@ -97,6 +174,7 @@ const config = {
   cronSchedule: process.env.CRON_SCHEDULE || "*/15 * * * *",
   cities: resolveCities(),
   categoryUrls: resolveCategoryUrls(),
+  mvideoCategories: resolveMvideoCategories(),
   playwright: {
     headless: process.env.PLAYWRIGHT_HEADLESS !== "false",
     slowMo: parseNumber(process.env.PLAYWRIGHT_SLOWMO, undefined),

@@ -1,93 +1,40 @@
+const { fetchCategoryOffers } = require("../mvideoApi");
 const config = require("../config");
 const { logger } = require("../logger");
-const { withPage, scrapeCategory } = require("./base");
-
-const DEFAULT_SELECTORS = {
-  card: "div.product-cards-layout__item",
-  skuAttr: "data-product-sku",
-  title: ".product-title__text",
-  price: ".price__main-value",
-  oldPrice: ".price__old-value",
-  url: "a.product-title__text",
-};
-
-function selectorOverrides(prefix, defaults) {
-  return Object.entries(defaults).reduce((acc, [key, value]) => {
-    const envKey = `${prefix}${key.toUpperCase()}`;
-    acc[key] = process.env[envKey] || value;
-    return acc;
-  }, {});
-}
-
-const SELECTORS = selectorOverrides("MVIDEO_SELECTOR_", DEFAULT_SELECTORS);
-
-let warnedCity = false;
-
-async function setupCity(page, cityName) {
-  if (!cityName) {
-    return;
-  }
-
-  const template = process.env.MVIDEO_CITY_URL_TEMPLATE;
-  if (!template) {
-    if (!warnedCity) {
-      logger.warn("M.Video city template is not configured; region might be incorrect", { city: cityName });
-      warnedCity = true;
-    }
-    return;
-  }
-
-  const url = template.replace("{city}", encodeURIComponent(cityName));
-  logger.info("Setting M.Video city", { city: cityName, url });
-  await page.goto(url, { waitUntil: "networkidle" });
-  await page.waitForTimeout(1_000);
-}
 
 async function scrapeMvideo(options = {}) {
-  const cityName = options.cityName || config.cities[0] || "Москва";
-  const categories = Object.entries(config.categoryUrls.mvideo);
+  const results = [];
+  const categories = config.mvideoCategories || [];
 
   if (categories.length === 0) {
-    logger.warn("M.Video categories are not configured. Provide MVIDEO_CATEGORY_URL_* in .env");
-    return [];
+    logger.warn("No M.Video API categories available for scraping");
+    return results;
   }
 
-  return withPage(async (page) => {
-    await setupCity(page, cityName);
+  for (const category of categories) {
+    const city = options.cityName || category.city || config.cities[0] || "Санкт-Петербург";
 
-    const result = [];
+    logger.info("Starting M.Video category scraping", {
+      op: "mvideoCategoryStart",
+      categoryId: category.id,
+      city,
+    });
 
-    for (const [category, url] of categories) {
-      try {
-        const items = await scrapeCategory({
-          page,
-          url,
-          selectors: SELECTORS,
-          cityName,
-          shop: "mvideo",
-        });
+    const offers = await fetchCategoryOffers(category, city);
+    results.push(...offers);
 
-        result.push(
-          ...items.map((item) => ({
-            ...item,
-            shop: "mvideo",
-            category,
-          }))
-        );
-      } catch (error) {
-        logger.error("M.Video category scraping failed", {
-          category,
-          url,
-          city: cityName,
-          error: error.message,
-        });
-      }
-    }
+    logger.info("Finished M.Video category scraping", {
+      op: "mvideoCategoryDone",
+      categoryId: category.id,
+      city,
+      offers: offers.length,
+    });
+  }
 
-    return result;
-  });
+  return results;
 }
 
 module.exports = {
   scrapeMvideo,
 };
+
